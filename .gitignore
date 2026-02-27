@@ -1,0 +1,6 @@
+.*
+!.gitignore
+!.ansible-lint
+collections/
+files/
+examples/test-*

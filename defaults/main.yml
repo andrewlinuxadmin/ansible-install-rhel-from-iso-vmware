@@ -1,0 +1,46 @@
+---
+vcenter_validate_certs: false
+
+vm_num_cpus: 2
+vm_memory_mb: 4096
+vm_disk_size_in_gb: 60
+vm_disk_type: "thin"
+vm_guest_id: "rhel9_64Guest"
+vm_wait_for_ip_timeout: 900
+vm_force_recreate: false
+
+ks_filename: "ks.cfg"
+ks_locale: "en_US.UTF-8"
+ks_keyboard: "us"
+ks_iso_work_dir: "/tmp/kickstart_iso"
+ks_iso_image: "{{ ks_iso_work_dir }}/{{ vm_name }}-ks.iso"
+ks_iso_label: "OEMDRV"
+ks_iso_datastore: "{{ vcenter_datastore }}"
+ks_iso_datastore_dir: "kickstart"
+ks_iso_datastore_path: "[{{ ks_iso_datastore }}] {{ ks_iso_datastore_dir }}/{{ vm_name }}-ks.iso"
+ks_disk_device: "sda"
+ks_vg_name: "vg_rhel"
+ks_lvs:
+  - name: lv_root
+    mount: /
+    size: 20480
+    fstype: xfs
+  - name: lv_var
+    mount: /var
+    size: 10240
+    fstype: xfs
+  - name: lv_var_log
+    mount: /var/log
+    size: 10240
+    fstype: xfs
+  - name: lv_home
+    mount: /home
+    size: 5120
+    fstype: xfs
+  - name: lv_swap
+    mount: swap
+    size: 4096
+    fstype: swap
+ks_ssh_config:
+  PermitRootLogin: "no"
+  PasswordAuthentication: "yes"

@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  role_name: install_rhel_from_iso_vmware
+  namespace: andrewlinuxadmin
+  author: andrewlinuxadmin
+  description: >-
+    Provisions a VM on VMware vSphere and performs a fully
+    automated RHEL installation using Kickstart delivered
+    via a second ISO image (OEMDRV).
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.14"
+
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+
+  galaxy_tags:
+    - vmware
+    - vsphere
+    - rhel
+    - kickstart
+    - provisioning
+    - iso
+    - anaconda
+
+dependencies: []

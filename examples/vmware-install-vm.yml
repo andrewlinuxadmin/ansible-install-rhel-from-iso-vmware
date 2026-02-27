@@ -1,0 +1,98 @@
+---
+- name: Provision VMware VM and install RHEL via Kickstart
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Verify xorrisofs is installed
+      ansible.builtin.command:
+        cmd: which xorrisofs
+      changed_when: false
+      delegate_to: localhost
+
+    - name: Install RHEL from ISO on VMware
+      ansible.builtin.include_role:
+        name: install_rhel_from_iso_vmware
+      vars:
+        # ── vCenter / ESXi ──────────────────────────────────────────────
+        vcenter_hostname: "vcenter.example.com"
+        vcenter_username: "administrator@vsphere.local"
+        vcenter_password: "{{ vault_vcenter_password }}"
+        vcenter_datacenter: "Datacenter"
+        vcenter_cluster: "Cluster01"
+        vcenter_datastore: "datastore1"
+        vcenter_network: "VM Network"
+        # vcenter_folder: "/vm/Linux"
+
+        # ── VM ───────────────────────────────────────────────────────────
+        vm_name: "rhel9-server"
+        vm_guest_id: "rhel9_64Guest"
+
+        # ── Network ──────────────────────────────────────────────────────
+        vm_network_ip: "192.168.1.100"
+        vm_network_mask: "255.255.255.0"
+        vm_network_gateway: "192.168.1.1"
+        vm_network_dns: "192.168.1.1"
+        vm_hostname: "rhel9-server.example.com"
+
+        # ── ISO / Kickstart ─────────────────────────────────────────────
+        rhel_iso_path: "[datastore1] iso/rhel-9.4-x86_64-dvd.iso"
+
+        # ── OS — Kickstart parameters ───────────────────────────────────
+        ks_root_password: "{{ vault_ks_root_password }}"
+        ks_timezone: "America/Sao_Paulo"
+
+        ks_lvs:
+          - name: lv_root
+            mount: /
+            size: 20480
+            fstype: xfs
+          - name: lv_usr
+            mount: /usr
+            size: 10240
+            fstype: xfs
+          - name: lv_var_log
+            mount: /var/log
+            size: 10240
+            fstype: xfs
+          - name: lv_swap
+            mount: swap
+            size: 4096
+            fstype: swap
+
+        vm_extra_disk:
+          size_gb: 400
+          type: "thin"
+          device: "sdb"
+          vg_name: "vg_satellite"
+          lvs:
+            - name: lv_var_lib_pulp
+              mount: /var/lib/pulp
+              size: 307200
+              fstype: xfs
+            - name: lv_var_lib_pgsql
+              mount: /var/lib/pgsql
+              size: 20480
+              fstype: xfs
+            - name: lv_opt_puppetlabs
+              mount: /opt/puppetlabs
+              size: 10240
+              fstype: xfs
+            - name: lv_var_lib_containers
+              mount: /var/lib/containers
+              size: 51200
+              fstype: xfs
+
+        # Extra packages to install
+        ks_extra_packages:
+          - jq
+          - unzip
+          - wget
+          - curl
+          - git
+          - ansible-core
+          - vim-enhanced
+          - bash-completion
+          - net-tools
+          - bind-utils
