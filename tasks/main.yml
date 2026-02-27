@@ -15,11 +15,17 @@
   failed_when: false
   delegate_to: localhost
 
-- name: Abort if VM already exists
-  ansible.builtin.fail:
+- name: VM already exists
+  ansible.builtin.debug:
     msg: >-
-      VM '{{ vm_name }}' already exists.
-      Delete it manually or use a different vm_name.
+      VM '{{ vm_name }}' already exists. Skipping creation.
+      Use vm_force_recreate=true to delete and recreate it.
+  when:
+    - _vm_exists.instance is defined
+    - not (vm_force_recreate | default(false) | bool)
+
+- name: End role if VM already exists
+  ansible.builtin.meta: end_role
   when:
     - _vm_exists.instance is defined
     - not (vm_force_recreate | default(false) | bool)
